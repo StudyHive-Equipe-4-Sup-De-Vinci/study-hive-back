@@ -1,5 +1,13 @@
 name: Build CleverCloud
 
+on:
+  workflow_run:
+    workflows: ["Stages"]
+    types:
+      - success
+    branches:
+      - master 
+
 jobs:
   build:
     runs-on: ubuntu-latest
