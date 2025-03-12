@@ -1,0 +1,6 @@
+jobs:
+  Build CleverCloud:
+  Deploy to CleverCloud:
+    needs: Build CleverCloud
+  Configure CleverCloud:
+    needs: [ Build CleverCloud, Deploy to CleverCloud]
