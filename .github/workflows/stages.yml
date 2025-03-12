@@ -11,7 +11,7 @@ on:
       - closed  
 
 jobs:
-  Build CleverCloud:
+  Build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -39,8 +39,8 @@ jobs:
           path: ./dist  # Remplace par ton dossier contenant les fichiers buildés
           retention-days: 1
 
-  Deploy to CleverCloud:
-    needs: Build CleverCloud
+  Deploy:
+    needs: Build 
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -74,8 +74,8 @@ jobs:
           git commit -m "Mise à jour automatique via CI/CD" || echo "Aucune modification à commit"
           git push clever master --force
 
-  Configure CleverCloud:
-    needs: [ Build CleverCloud, Deploy to CleverCloud]
+  Configure:
+    needs: [ Build, Deploy]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
