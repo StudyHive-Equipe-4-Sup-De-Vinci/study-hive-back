@@ -70,6 +70,8 @@ jobs:
       - name: Déployer sur Clever Cloud
         run: |
           git remote add clever git+ssh://git@push-n3-par-clevercloud-customers.services.clever-cloud.com/${{ secrets.APP_ID }}.git || true
+          git fetch --unshallow
+          git pull --rebase clever master
           git add .
           git commit -m "Mise à jour automatique via CI/CD" || echo "Aucune modification à commit"
           git push clever master --force
