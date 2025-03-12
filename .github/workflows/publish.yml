@@ -67,3 +67,4 @@ jobs:
              clever env set db_database ${{ secrets.DB_DATABSE }} --alias BACK_PROD
              clever env set back_port ${{ secrets.BACK_PORT }} --alias BACK_PROD
              clever restart 
+#e
