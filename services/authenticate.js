@@ -28,6 +28,7 @@ async function register(req, res, next) {
         is_admin: false,
         registration_date: new Date(),
         access_token: null,
+        profile_picture_link: null,
       },
       { transaction }
     );

@@ -46,6 +46,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         field: "dt_inscription",
       },
+      profile_picture_link: {
+        type: DataTypes.TEXT,
+        defaultValue: null,
+      },
     },
     {
       sequelize,
