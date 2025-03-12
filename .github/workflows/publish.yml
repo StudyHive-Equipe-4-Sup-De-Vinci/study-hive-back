@@ -61,4 +61,4 @@ jobs:
              clever en set db_port ${{ secrets.DB_PORT }} --alias BACK_PROD
              clever en set db_database ${{ secrets.DB_DATABSE }} --alias BACK_PROD
              clever en set back_port ${{ secrets.BACK_PORT }} --alias BACK_PROD
-             clever restart --alias BACK_PROD
+             clever restart 
