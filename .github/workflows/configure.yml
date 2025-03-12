@@ -1,0 +1,37 @@
+name: Configure CleverCloud
+
+on:
+  workflow_run:
+    workflows: ["Deploy to CleverCloud"]
+    types:
+      - completed
+    branches:
+      - master  
+
+jobs:
+  configure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer les fichiers buildés
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: ./dist
+
+      - name: Configurer les variables Clever Cloud
+        run: |
+          clever login --token ${{ secrets.CLEVER_TOKEN }} --secret ${{ secrets.CLEVER_SECRET }}
+          clever link ${{ secrets.APP_ID }} --alias BACK_PROD
+          
+          clever env set DB_USERNAME ${{ secrets.DB_USERNAME }} --alias BACK_PROD
+          clever env set DB_PASSWORD ${{ secrets.DB_PASSWORD }} --alias BACK_PROD
+          clever env set DB_HOST ${{ secrets.DB_HOST }} --alias BACK_PROD
+          clever env set DB_PORT ${{ secrets.DB_PORT }} --alias BACK_PROD
+          clever env set DB_DATABASE ${{ secrets.DB_DATABASE }} --alias BACK_PROD
+          clever env set BACK_PORT ${{ secrets.BACK_PORT }} --alias BACK_PROD
+          
+          # Lancer le redémarrage sans bloquer la pipeline
+          clever restart --alias BACK_PROD & disown
+
+      - name: Afficher un message de fin
+        run: echo "✅ Déploiement et configuration terminés avec succès !"

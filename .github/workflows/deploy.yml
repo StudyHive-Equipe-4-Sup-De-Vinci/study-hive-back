@@ -1,0 +1,44 @@
+name: Deploy to CleverCloud
+
+on:
+  workflow_run:
+    workflows: ["Build CleverCloud"]
+    types:
+      - completed
+    branches:
+      - master  
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout du repo
+        uses: actions/checkout@v4
+      
+      - name: Récupérer les fichiers buildés
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: ./dist
+
+      - name: Ajouter la clé SSH pour Clever Cloud
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.CLEVER_SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan push-n3-par-clevercloud-customers.services.clever-cloud.com >> ~/.ssh/known_hosts
+
+      - name: Configurer Git pour GitHub Actions
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "GitHub Actions"
+          rm -f .git/index.lock
+
+      - name: Déployer sur Clever Cloud
+        run: |
+          git remote add clever git+ssh://git@push-n3-par-clevercloud-customers.services.clever-cloud.com/${{ secrets.APP_ID }}.git || true
+          git add .
+          git commit -m "Mise à jour automatique via CI/CD" || echo "Aucune modification à commit"
+          git push clever master --force
