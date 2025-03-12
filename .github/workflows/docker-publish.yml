@@ -42,4 +42,4 @@ jobs:
              git commit -m "Mise à jour automatique via CI/CD" || echo "Aucune modification à commit"
              git push clever master --force
 
-      
+  #e
