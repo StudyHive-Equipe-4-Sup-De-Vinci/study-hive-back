@@ -1,0 +1,20 @@
+{
+  "apps": [
+    {
+      "app_id": "app_02d1ed76-1f17-4e6b-9827-f634a9f20fdd",
+      "org_id": "user_40b871b1-945e-468b-9bb4-1768f9da4fa8",
+      "deploy_url": "https://push-n3-par-clevercloud-customers.services.clever-cloud.com/app_02d1ed76-1f17-4e6b-9827-f634a9f20fdd.git",
+      "git_ssh_url": "git+ssh://git@push-n3-par-clevercloud-customers.services.clever-cloud.com/app_02d1ed76-1f17-4e6b-9827-f634a9f20fdd.git",
+      "name": "test",
+      "alias": "test"
+    },
+    {
+      "app_id": "app_423c8dfe-3231-4237-9b00-423d32d0471d",
+      "org_id": "orga_4bfe0445-43ce-4767-b24d-03ab8c7f2171",
+      "deploy_url": "https://push-n3-par-clevercloud-customers.services.clever-cloud.com/app_423c8dfe-3231-4237-9b00-423d32d0471d.git",
+      "git_ssh_url": "git+ssh://git@push-n3-par-clevercloud-customers.services.clever-cloud.com/app_423c8dfe-3231-4237-9b00-423d32d0471d.git",
+      "name": "BACK_PROD",
+      "alias": "BACK_PROD"
+    }
+  ]
+}
