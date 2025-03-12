@@ -17,7 +17,7 @@ const db_string =
   process.env.DB_PORT +
   "/" +
   process.env.DB_DATABASE;
-const sequelize = new Sequelize(db_string);
+const sequelize = new Sequelize(db_string, { schema: process.env.DB_SCHEMA });
 
 fs.readdirSync(__dirname)
   .filter((file) => {
