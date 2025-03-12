@@ -1,9 +1,12 @@
-var express = require('express');
-var router = express.Router();
+const authenticateRoutes = require("./authenticate");
+const cors = require("cors");
+const corsOptions = {
+  origin: "*",
+};
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+function initRoutes(app) {
+  app.use(cors(corsOptions));
+  app.use("/", authenticateRoutes);
+}
 
-module.exports = router;
+module.exports = initRoutes;
