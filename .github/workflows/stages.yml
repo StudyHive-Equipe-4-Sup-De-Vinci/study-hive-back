@@ -12,7 +12,95 @@ on:
 
 jobs:
   Build CleverCloud:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Installer les outils nécessaires
+        run: |
+          sudo apt update
+          sudo apt install -y gpg curl git
+          
+          curl -fsSL https://clever-tools.clever-cloud.com/gpg/cc-nexus-deb.public.gpg.key | sudo gpg --dearmor -o /usr/share/keyrings/cc-nexus-deb.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/cc-nexus-deb.gpg] https://nexus.clever-cloud.com/repository/deb stable main" | sudo tee -a /etc/apt/sources.list
+          
+          sudo apt-get update
+          sudo apt-get install clever-tools
+
+      - name: Créer des fichiers buildés (exemple)
+        run: |
+          mkdir dist
+          echo "Fichier généré lors du build" > dist/build-file.txt
+
+      - name: Sauvegarder les fichiers buildés
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: ./dist  # Remplace par ton dossier contenant les fichiers buildés
+          retention-days: 1
+
   Deploy to CleverCloud:
     needs: Build CleverCloud
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Récupérer les fichiers buildés
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: ./dist
+
+      - name: Ajouter la clé SSH pour Clever Cloud
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.CLEVER_SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan push-n3-par-clevercloud-customers.services.clever-cloud.com >> ~/.ssh/known_hosts
+
+      - name: Configurer Git pour GitHub Actions
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "GitHub Actions"
+          rm -f .git/index.lock
+
+      - name: Déployer sur Clever Cloud
+        run: |
+          git remote add clever git+ssh://git@push-n3-par-clevercloud-customers.services.clever-cloud.com/${{ secrets.APP_ID }}.git || true
+          git add .
+          git commit -m "Mise à jour automatique via CI/CD" || echo "Aucune modification à commit"
+          git push clever master --force
+
   Configure CleverCloud:
     needs: [ Build CleverCloud, Deploy to CleverCloud]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Récupérer les fichiers buildés
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: ./dist
+
+      - name: Configurer les variables Clever Cloud
+        run: |
+          clever login --token ${{ secrets.CLEVER_TOKEN }} --secret ${{ secrets.CLEVER_SECRET }}
+          clever link ${{ secrets.APP_ID }} --alias BACK_PROD
+          
+          clever env set DB_USERNAME ${{ secrets.DB_USERNAME }} --alias BACK_PROD
+          clever env set DB_PASSWORD ${{ secrets.DB_PASSWORD }} --alias BACK_PROD
+          clever env set DB_HOST ${{ secrets.DB_HOST }} --alias BACK_PROD
+          clever env set DB_PORT ${{ secrets.DB_PORT }} --alias BACK_PROD
+          clever env set DB_DATABASE ${{ secrets.DB_DATABASE }} --alias BACK_PROD
+          clever env set BACK_PORT ${{ secrets.BACK_PORT }} --alias BACK_PROD
+          
+          # Lancer le redémarrage sans bloquer la pipeline
+          clever restart --alias BACK_PROD & disown
+
+      - name: Afficher un message de fin
+        run: echo "✅ Déploiement et configuration terminés avec succès !"
