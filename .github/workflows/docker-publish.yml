@@ -1,0 +1,45 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - master  
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout du repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+     
+      - name: Ajouter la clé SSH pour Clever Cloud
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.CLEVER_SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan push-n3-par-clevercloud-customers.services.clever-cloud.com >> ~/.ssh/known_hosts
+
+      - name: Installer GIT
+        run: sudo apt update | sudo apt install git -y
+      
+      - name: Configurer Git pour GitHub Actions
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Supprimer un éventuel fichier lock de Git
+        run: rm -f .git/index.lock
+
+      - name: Deploy github
+        run: |
+             git remote add clever git+ssh://git@push-n3-par-clevercloud-customers.services.clever-cloud.com/${{ secrets.APP_ID }}.git 
+             git add .
+             git commit -m "Mise à jour automatique via CI/CD" || echo "Aucune modification à commit"
+             git push clever master --force
+
+      
