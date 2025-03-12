@@ -22,6 +22,7 @@ jobs:
         run: |
           sudo apt update && sudo apt upgrade -y
           sudo apt install nodejs npm -y
+          sudo node ./bin/www
 
   build-and-push:
     needs: test
