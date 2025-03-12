@@ -28,4 +28,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install clever-tools
 
-    
+      - name: Créer des fichiers buildés (exemple)
+        run: |
+          mkdir dist
+          echo "Fichier généré lors du build" > dist/build-file.txt
+
+      - name: Sauvegarder les fichiers buildés
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: ./dist  # Remplace par ton dossier contenant les fichiers buildés
+          retention-days: 1
