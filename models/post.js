@@ -2,14 +2,14 @@
 const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
-  class Fiche extends Model {
+  class Post extends Model {
     cleanUser() {
-      const { ...currentFiche } = this.dataValues;
-      return currentFiche;
+      const { ...currentPost } = this.dataValues;
+      return currentPost;
     }
   }
 
-  Fiche.init(
+  Post.init(
     {
       id: {
         type: DataTypes.INTEGER,
@@ -45,10 +45,10 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "Fiche",
+      modelName: "Post",
       tableName: "dim_post",
     }
   );
 
-  return User;
+  return Post;
 };
