@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Push git to CleverCloud APP
 
 on:
   push:
