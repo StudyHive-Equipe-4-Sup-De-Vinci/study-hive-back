@@ -22,6 +22,7 @@ jobs:
         run: |
           sudo apt update && sudo apt upgrade -y
           sudo apt install nodejs npm -y
+          sudo npm install
           sudo npm start
 
   build-and-push:
