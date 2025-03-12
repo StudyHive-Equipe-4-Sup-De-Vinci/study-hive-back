@@ -23,7 +23,11 @@ jobs:
           sudo apt update && sudo apt upgrade -y
           sudo apt install nodejs npm -y
           sudo npm install
-          sudo npm start
+          sudo npm start --silent &
+
+      - name: Test curl
+        run: |
+          curl localhost:3000
 
   build-and-push:
     needs: test
