@@ -54,7 +54,7 @@ jobs:
       - name: SET VENV
         run: |
              clever login --token ${{ secrets.CLEVER_TOKEN }} --secret ${{ secrets.CLEVER_SECRET }}
-             clever link ${{ secrets.APP_ID }} --alias BACK_PROD
+             clever link ${{ secrets.APP_ID }} 
              clever env set db_username ${{ secrets.DB_USERNAME }} --alias BACK_PROD
              clever env set db_password ${{ secrets.DB_PASSWORD }} --alias BACK_PROD
              clever env set db_host ${{ secrets.DB_HOST }} --alias BACK_PROD
