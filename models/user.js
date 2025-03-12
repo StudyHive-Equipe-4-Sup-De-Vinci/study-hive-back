@@ -17,15 +17,17 @@ module.exports = (sequelize, DataTypes) => {
         autoIncrement: true,
         field: "id_user",
       },
-      pseudo: {
+      name: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
+        field: "pseudo",
       },
       email: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
+        field: "mail",
       },
       password: {
         type: DataTypes.STRING,
@@ -39,14 +41,17 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         allowNull: false,
       },
-      dt_register: {
+      registration_date: {
         type: DataTypes.DATE,
         allowNull: false,
+        field: "dt_inscription",
       },
     },
     {
       sequelize,
       modelName: "User",
+      tableName: "dim_user",
+      timestamps: false,
     }
   );
 

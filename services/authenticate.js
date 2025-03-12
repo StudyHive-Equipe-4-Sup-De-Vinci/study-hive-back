@@ -26,6 +26,8 @@ async function register(req, res, next) {
         email,
         password: hashedPassword,
         is_admin: false,
+        registration_date: new Date(),
+        access_token: null,
       },
       { transaction }
     );

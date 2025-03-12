@@ -6,7 +6,17 @@ const Sequelize = require("sequelize");
 const basename = path.basename(__filename);
 const db = {};
 
-const db_string = 'postgres://' + process.env.DB_USERNAME + ':' + process.env.DB_PASSWORD + '@' + process.env.DB_HOST + ':' + process.env.DB_PORT + '/' + process.env.DB_DATABASE;
+const db_string =
+  "postgres://" +
+  process.env.DB_USERNAME +
+  ":" +
+  process.env.DB_PASSWORD +
+  "@" +
+  process.env.DB_HOST +
+  ":" +
+  process.env.DB_PORT +
+  "/" +
+  process.env.DB_DATABASE;
 const sequelize = new Sequelize(db_string);
 
 fs.readdirSync(__dirname)
