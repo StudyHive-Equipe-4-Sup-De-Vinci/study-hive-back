@@ -60,10 +60,10 @@ jobs:
         run: |
              clever login --token ${{ secrets.CLEVER_TOKEN }} --secret ${{ secrets.CLEVER_SECRET }}
              clever link ${{ secrets.APP_ID }} --alias BACK_PROD
-             clever env set db_username ${{ secrets.DB_USERNAME }} --alias BACK_PROD
-             clever env set db_password ${{ secrets.DB_PASSWORD }} --alias BACK_PROD
-             clever env set db_host ${{ secrets.DB_HOST }} --alias BACK_PROD
-             clever env set db_port ${{ secrets.DB_PORT }} --alias BACK_PROD
-             clever env set db_database ${{ secrets.DB_DATABASE }} --alias BACK_PROD
-             clever env set back_port ${{ secrets.BACK_PORT }} --alias BACK_PROD
+             clever env set DB_USERNAM ${{ secrets.DB_USERNAME }} --alias BACK_PROD
+             clever env set DB_PASSWORD ${{ secrets.DB_PASSWORD }} --alias BACK_PROD
+             clever env set DB_HOST ${{ secrets.DB_HOST }} --alias BACK_PROD
+             clever env set DB_PORT ${{ secrets.DB_PORT }} --alias BACK_PROD
+             clever env set DB_DATABASE ${{ secrets.DB_DATABASE }} --alias BACK_PROD
+             clever env set BACK_PORT ${{ secrets.BACK_PORT }} --alias BACK_PROD
              clever restart --alias BACK_PROD
