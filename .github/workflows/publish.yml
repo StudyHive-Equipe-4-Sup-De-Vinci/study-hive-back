@@ -66,4 +66,4 @@ jobs:
              clever env set DB_PORT ${{ secrets.DB_PORT }} --alias BACK_PROD
              clever env set DB_DATABASE ${{ secrets.DB_DATABASE }} --alias BACK_PROD
              clever env set BACK_PORT ${{ secrets.BACK_PORT }} --alias BACK_PROD
-             clever restart --alias BACK_PROD
+             nohup clever restart --alias BACK_PROD > /dev/null 2>&1 &
