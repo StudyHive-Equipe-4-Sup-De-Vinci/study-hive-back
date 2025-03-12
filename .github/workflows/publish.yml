@@ -12,27 +12,25 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout du repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-
-  build-and-push:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout du repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
+      
       - name: Installer Nodes
         run: |
           sudo apt update && sudo apt upgrade -y
           sudo apt install nodejs npm -y
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout du repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
         
       - name: install clever cloud
         run: |
