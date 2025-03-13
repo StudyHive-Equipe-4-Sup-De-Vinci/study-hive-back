@@ -51,9 +51,12 @@ function authMiddleware(req, res, next) {
     }
     const user = await User.findByPk(decoded.user.id);
 
-    const right_token = await bcrypt.compare(token, user.access_token);
-
-    if (!right_token) {
+    try {
+      const right_token = await bcrypt.compare(token, user.access_token);
+      if (!right_token) {
+        return res.status(403).send({ message: "Session expired" });
+      }
+    } catch {
       return res.status(403).send({ message: "Session expired" });
     }
 
