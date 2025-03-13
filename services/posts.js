@@ -217,9 +217,9 @@ async function deletePost(req, res, next) {
 
 async function getFavoritePostsOfUser(req, res, next) {
   try {
-    const userId = req.user.id;
-    const currentPage = parseInt(req.query.page) || 1;
-    const pageSize = parseInt(req.query.pageSize) || 10;
+    const user_id = req.user.id;
+    const currentPage = parseInt(req.body.page) || 1;
+    const pageSize = parseInt(req.body.pageSize) || 10;
 
     const offset = (currentPage - 1) * pageSize;
 
@@ -227,27 +227,14 @@ async function getFavoritePostsOfUser(req, res, next) {
       {
         limit: pageSize,
         offset: offset,
-      },
-      {
         where: {
-          user_id: userId,
+          user_id,
           action_id: 3,
         },
-        attributes: ["post_id"],
         include: [
           {
             model: Post,
             as: "post",
-            include: [
-              {
-                model: User,
-                as: "user",
-              },
-              {
-                model: Category,
-                as: "category",
-              },
-            ],
           },
         ],
       }
@@ -354,8 +341,20 @@ function getPostsFiltered(req, res, next) {}
 async function likePost(req, res, next) {
 	try {
 		const userId = req.user.id;
-		const postId = req.body.post_id;
-		const like = await UserAction.create({
+		const postId = req.params.id;
+		var like = await UserAction.findOne({
+			where: {
+				user_id: userId,
+				post_id: postId,
+				action_id: 1,
+			}
+		});
+		if (like) {
+			return res.status(200).json({
+				message: "You already liked this post",
+			});
+		}
+		like = await UserAction.create({
 			user_id: userId,
 			post_id: postId,
 			action_id: 1,
@@ -392,15 +391,190 @@ async function likePost(req, res, next) {
 	}
 }
 
-function unlikePost(req, res, next) {}
+async function unlikePost(req, res, next) {
+	try {
+		const userId = req.user.id;
+		const postId = req.params.id;
+		var like = await UserAction.findOne({
+			where: {
+				user_id: userId,
+				post_id: postId,
+				action_id: 1,
+			}
+		});
+		if (!like) {
+			return res.status(200).json({
+				message: "You are currently not liking this post",
+			});
+		}
+		like.destroy();
+		const likes = await UserAction.findAll({
+			where: {
+				user_id: userId,
+				action_id: 1,
+			}
+		});
+		const dislikes = await UserAction.findAll({
+			where: {
+				user_id: userId,
+				action_id: 2,
+			}
+		});
+    res.status(200).json({
+      message: "Post unliked successfully",
+			grade: likes.length - dislikes.length,
+    });
+	} catch (error) {
+    res.status(500).send({ error: error.message });
+	}
+}
 
-function dislikePost(req, res, next) {}
+async function dislikePost(req, res, next) {
+	try {
+		const userId = req.user.id;
+		const postId = req.params.id;
+		var dislike = await UserAction.findOne({
+			where: {
+				user_id: userId,
+				post_id: postId,
+				action_id: 2,
+			}
+		});
+		if (dislike) {
+			return res.status(200).json({
+				message: "You already disliked this post",
+			});
+		}
+		dislike = await UserAction.create({
+			user_id: userId,
+			post_id: postId,
+			action_id: 2,
+			date: new Date(),
+		});
+		const like = await UserAction.findOne({
+			where: {
+				user_id: userId,
+				post_id: postId,
+				action_id: 1,
+			}
+		});
+		if (like) {
+			like.destroy();
+		}
+		const likes = await UserAction.findAll({
+			where: {
+				user_id: userId,
+				action_id: 1,
+			}
+		});
+		const dislikes = await UserAction.findAll({
+			where: {
+				user_id: userId,
+				action_id: 2,
+			}
+		});
+    res.status(200).json({
+      message: "Post disliked successfully",
+			grade: likes.length - dislikes.length,
+    });
+	} catch (error) {
+    res.status(500).send({ error: error.message });
+	}
+}
 
-function undislikePost(req, res, next) {}
+async function undislikePost(req, res, next) {
+	try {
+		const userId = req.user.id;
+		const postId = req.params.id;
+		var dislike = await UserAction.findOne({
+			where: {
+				user_id: userId,
+				post_id: postId,
+				action_id: 2,
+			}
+		});
+		if (!dislike) {
+			return res.status(200).json({
+				message: "You are currently not disliking this post",
+			});
+		}
+		dislike.destroy();
+		const likes = await UserAction.findAll({
+			where: {
+				user_id: userId,
+				action_id: 1,
+			}
+		});
+		const dislikes = await UserAction.findAll({
+			where: {
+				user_id: userId,
+				action_id: 2,
+			}
+		});
+    res.status(200).json({
+      message: "Post undisliked successfully",
+			grade: likes.length - dislikes.length,
+    });
+	} catch (error) {
+    res.status(500).send({ error: error.message });
+	}
+}
 
-function savePost(req, res, next) {}
+async function savePost(req, res, next) {
+	try {
+		const userId = req.user.id;
+		const postId = req.params.id;
+		var save = await UserAction.findOne({
+			where: {
+				user_id: userId,
+				post_id: postId,
+				action_id: 3,
+			}
+		});
+		if (save) {
+			return res.status(200).json({
+				message: "You already saved this post",
+			});
+		}
+		save = await UserAction.create({
+			user_id: userId,
+			post_id: postId,
+			action_id: 3,
+			date: new Date(),
+		});
+    res.status(200).json({
+      message: "Post saved successfully",
+    });
+	} catch (error) {
+    res.status(500).send({ error: error.message });
+	}
+}
 
-function unsavePost(req, res, next) {}
+async function unsavePost(req, res, next) {
+	
+	try {
+		const userId = req.user.id;
+		const postId = req.params.id;
+		var save = await UserAction.findOne({
+			where: {
+				user_id: userId,
+				post_id: postId,
+				action_id: 3,
+			}
+		});
+		if (!save) {
+			return res.status(200).json({
+				message: "You have not saved this post",
+			});
+		}
+		save.destroy();
+    res.status(200).json({
+      message: "Post unsaved successfully",
+    });
+	} catch (error) {
+    res.status(500).send({ error: error.message });
+	}
+}
 
 function commentOnPost(req, res, next) {}
 
