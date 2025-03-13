@@ -8,7 +8,7 @@ const {
 } = require("../models");
 const { uploadFileToS3 } = require("./aws");
 
-/**
+/**F
  * Method to retrieve all posts, take pagination into account.
  * @param {Request} req - You can include in the body the page number et pageSize (default is 1 and 10 respectively).
  *

@@ -54,16 +54,16 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         field: "content_link",
       },
-			description: {
+      description: {
         type: DataTypes.STRING,
         allowNull: true,
-				defaultValue: null,
-			},
-			user_id: {
-				type: DataTypes.STRING,
-				allowNull: false,
-				field: "id_user",
-			},
+        defaultValue: null,
+      },
+      user_id: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        field: "id_user",
+      },
       category_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -74,8 +74,8 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: "Post",
       tableName: "dim_post",
-      createdAt: 'created_at',
-      updatedAt: 'updated_at',
+      createdAt: "created_at",
+      updatedAt: "updated_at",
     }
   );
 

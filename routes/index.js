@@ -520,5 +520,4 @@ function initRoutes(app) {
  *           example: "2022-01-01T00:00:00Z"
  */
 
-
 module.exports = initRoutes;

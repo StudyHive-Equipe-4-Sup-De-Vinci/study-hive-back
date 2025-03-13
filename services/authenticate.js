@@ -21,7 +21,7 @@ async function login(req, res, next) {
   });
 
   user.access_token = await bcrypt.hash(token, 8);
-  user.save();
+  user.save();F
 
   return res.status(200).send({
     message: `User logged in successfully`,
