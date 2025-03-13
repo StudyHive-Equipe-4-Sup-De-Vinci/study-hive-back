@@ -1,9 +1,14 @@
-var express = require('express');
-var router = express.Router();
+const userRoutes = require("./users");
+const authenticationRoutes = require("./authenticate");
+const cors = require("cors");
+const corsOptions = {
+  origin: "*",
+};
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+function initRoutes(app) {
+  app.use(cors(corsOptions));
+  app.use("/", authenticationRoutes);
+  app.use("/api/users", userRoutes);
+}
 
-module.exports = router;
+module.exports = initRoutes;
