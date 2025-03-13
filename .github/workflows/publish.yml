@@ -22,12 +22,28 @@ jobs:
         run: |
           sudo apt update && sudo apt upgrade -y
           sudo apt install nodejs npm -y
+
+      - name: Build du server
+        run: |
           sudo npm install
-          sudo node ./bin/www --silent &
+      
+      - name: Lancement du server
+        run: |
+          sudo DB_USERNAME=${{ secrets.DB_USERNAME }} \
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+          DB_HOST=${{ secrets.DB_HOST }} \
+          DB_PORT=${{ secrets.DB_PORT }} \
+          DB_DATABASE=${{ secrets.DB_DATABASE }} \
+          DB_SCHEMA=${{ secrets.DB_SCHEMA }} \
+          node ./bin/www --silent &
 
       - name: Test curl
         run: |
-          curl localhost:3000
+          for i in {1..5}; do
+            curl --retry 5 --retry-delay 5 --retry-connrefused http://localhost:3000/health_check && break
+            echo "Retry $i..."
+            sleep 5
+          done
 
   build-and-push:
     needs: test
@@ -77,11 +93,12 @@ jobs:
       - name: SET VENV
         run: |
           clever login --token ${{ secrets.CLEVER_TOKEN }} --secret ${{ secrets.CLEVER_SECRET }}
-          clever link ${{ secrets.APP_ID_DEV }} --alias BACK_PROD
-          clever env set DB_USERNAME ${{ secrets.DB_USERNAME }} --alias BACK_PROD
-          clever env set DB_PASSWORD ${{ secrets.DB_PASSWORD }} --alias BACK_PROD
-          clever env set DB_HOST ${{ secrets.DB_HOST }} --alias BACK_PROD
-          clever env set DB_PORT ${{ secrets.DB_PORT }} --alias BACK_PROD
-          clever env set DB_DATABASE ${{ secrets.DB_DATABASE }} --alias BACK_PROD
-          clever env set BACK_PORT ${{ secrets.BACK_PORT }} --alias BACK_PROD
-          nohup clever restart --alias BACK_PROD > /dev/null 2>&1 &
+          clever link ${{ secrets.APP_ID_DEV }} --alias BACK_DEV
+          clever env set DB_USERNAME ${{ secrets.DB_USERNAME }} --alias BACK_DEV
+          clever env set DB_PASSWORD ${{ secrets.DB_PASSWORD }} --alias BACK_DEV
+          clever env set DB_HOST ${{ secrets.DB_HOST }} --alias BACK_DEV
+          clever env set DB_PORT ${{ secrets.DB_PORT }} --alias BACK_DEV
+          clever env set DB_DATABASE ${{ secrets.DB_DATABASE }} --alias BACK_DEV
+          clever env set BACK_PORT ${{ secrets.BACK_PORT }} --alias BACK_DEV
+          clever env set DB_SCHEMA ${{ secrets.DB_SCHEMA }} --alias BACK_DEV
+          nohup clever restart --alias BACK_DEV > /dev/null 2>&1 &

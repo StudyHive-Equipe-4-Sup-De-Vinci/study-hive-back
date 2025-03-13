@@ -1,4 +1,6 @@
+const { Op } = require("sequelize");
 const { Action, Category, Comment, Post, UserAction, User, sequelize } = require("../models");
+const { post } = require("../app");
 
 /**
  * Method to retrieve all posts, take pagination into account.
@@ -223,22 +225,32 @@ async function getFavoritePostsOfUser(req, res, next) {
 
     const offset = (currentPage - 1) * pageSize;
 
-    const { count, rows } = await UserAction.findAndCountAll(
-      {
-        limit: pageSize,
-        offset: offset,
-        where: {
-          user_id,
-          action_id: 3,
-        },
-        include: [
-          {
-            model: Post,
-            as: "post",
-          },
-        ],
-      }
-    );
+    const userActions = await UserAction.findAll({
+			where: {
+        user_id,
+        action_id: 3,
+      },
+      attributes: ['post_id'],
+    });
+
+		const post_ids = userActions.map((post) => post.post_id);
+    const { count, rows } = await Post.findAndCountAll({
+			limit: pageSize,
+			offset: offset,
+      where: {
+        id: post_ids,
+      },
+			include: [
+				{
+					model: User,
+					as: "user",
+				},
+				{
+					model: Category,
+					as: "category",
+				},
+			],
+    });
 
     res.status(200).json({
       posts: rows,
@@ -254,7 +266,7 @@ async function getFavoritePostsOfUser(req, res, next) {
 
 async function getPostsCreatedByUser(req, res, next) {
   try {
-    const user_id = req.user.id;
+    const user_id = req.params.id;
     const currentPage = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
 
@@ -264,8 +276,6 @@ async function getPostsCreatedByUser(req, res, next) {
       {
         limit: pageSize,
         offset: offset,
-      },
-      {
         where: {
           user_id,
         },
@@ -296,7 +306,7 @@ async function getPostsCreatedByUser(req, res, next) {
 
 async function getPostsByCategory(req, res, next) {
 	try {
-		const categoryId = req.body.category_id;
+		const categoryId = req.params.id;
     const currentPage = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
 
@@ -306,8 +316,6 @@ async function getPostsByCategory(req, res, next) {
       {
         limit: pageSize,
         offset: offset,
-      },
-      {
         where: {
           category_id: categoryId,
         },
@@ -315,10 +323,6 @@ async function getPostsByCategory(req, res, next) {
           {
             model: User,
             as: "user",
-          },
-          {
-            model: Category,
-            as: "category",
           },
         ],
       }
@@ -336,7 +340,58 @@ async function getPostsByCategory(req, res, next) {
   }
 }
 
-function getPostsFiltered(req, res, next) {}
+async function getPostsFiltered(req, res, next) {
+	try {
+    const { search_query, category_id } = req.body;
+    const currentPage = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 10;
+
+    const offset = (currentPage - 1) * pageSize;
+    const whereConditions = {};
+    if (
+      category_id !== undefined &&
+      category_id !== null &&
+      !isNaN(category_id)
+    ) {
+      whereConditions.category_id = category_id;
+    }
+
+    if (search_query && search_query !== "") {
+      whereConditions[Op.or] = [
+        { title: { [Op.like]: `%${search_query.toLowerCase()}%` } },
+      ];
+    }
+
+    const { count, rows } = await Post.findAndCountAll({
+			limit: pageSize,
+			offset: offset,
+      where: whereConditions,
+			include: [
+				{
+					model: User,
+					as: "user",
+				},
+				{
+					model: Category,
+					as: "category",
+				},
+			],
+    });
+
+    res.status(200).json({
+      posts: rows,
+      totalPosts: count,
+      totalPages: Math.ceil(count / pageSize),
+      currentPage: currentPage,
+      pageSize: pageSize,
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: "Something went wrong",
+      error: error.message || error,
+    });
+  }
+}
 
 async function likePost(req, res, next) {
 	try {
