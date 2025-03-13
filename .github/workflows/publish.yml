@@ -23,7 +23,7 @@ jobs:
           sudo apt update && sudo apt upgrade -y
           sudo apt install nodejs npm -y
           sudo npm install
-          sudo npm start --silent &
+          sudo node ./bin/www --silent &
 
       - name: Test curl
         run: |
@@ -85,5 +85,3 @@ jobs:
              clever env set DB_DATABASE ${{ secrets.DB_DATABASE }} --alias BACK_PROD
              clever env set BACK_PORT ${{ secrets.BACK_PORT }} --alias BACK_PROD
              nohup clever restart --alias BACK_PROD > /dev/null 2>&1 &
-
-#e
