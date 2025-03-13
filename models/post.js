@@ -13,10 +13,25 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "owner_id",
         as: "user",
       });
-
       Post.belongsTo(models.Category, {
         foreignKey: "category_id",
         as: "category",
+      });
+      Post.hasMany(models.UserAction, {
+        foreignKey: "post_id",
+        as: "likes",
+      });
+      Post.hasMany(models.UserAction, {
+        foreignKey: "post_id",
+        as: "dislikes",
+      });
+      Post.hasMany(models.UserAction, {
+        foreignKey: "post_id",
+        as: "favs",
+      });
+      Post.hasMany(models.Comment, {
+        foreignKey: "post_id",
+        as: "comments",
       });
     }
   }
@@ -39,11 +54,6 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         field: "content_link",
       },
-      category_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        field: "id_category",
-      },
 			description: {
         type: DataTypes.STRING,
         allowNull: true,
@@ -54,6 +64,11 @@ module.exports = (sequelize, DataTypes) => {
 				allowNull: false,
 				field: "id_user",
 			},
+      category_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        field: "id_category",
+      },
     },
     {
       sequelize,

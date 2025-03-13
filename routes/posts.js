@@ -60,8 +60,17 @@ const {
  *                         type: integer
  *                       title:
  *                         type: string
- *                       content_link:
+ *                       content:
  *                         type: string
+ *                 totalPages:
+ *                   type: integer
+ *                   example: 5
+ *                 currentPage:
+ *                   type: integer
+ *                   example: 1
+ *                 pageSize:
+ *                   type: integer
+ *                   example: 10
  *       500:
  *         description: Internal server error
  */
@@ -70,5 +79,7 @@ router.get("/", getPost);
 router.post("/", authMiddleware, createPost);
 router.put("/", authMiddleware, checkIsPostOwner, updatePost);
 router.delete("/", authMiddleware, checkIsPostOwnerOrAdmin, deletePost);
+
+
 
 module.exports = router;

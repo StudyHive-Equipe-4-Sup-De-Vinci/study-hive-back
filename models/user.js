@@ -35,15 +35,20 @@ module.exports = (sequelize, DataTypes) => {
         unique: true,
         field: "pseudo",
       },
+      registration_date: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        field: "dt_inscription",
+      },
+      password: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
       email: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
         field: "mail",
-      },
-      password: {
-        type: DataTypes.STRING,
-        allowNull: false,
       },
       access_token: {
         type: DataTypes.TEXT,
@@ -52,11 +57,6 @@ module.exports = (sequelize, DataTypes) => {
       is_admin: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
-      },
-      registration_date: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        field: "dt_inscription",
       },
       profile_picture_link: {
         type: DataTypes.TEXT,
