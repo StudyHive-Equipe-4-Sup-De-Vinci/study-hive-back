@@ -80,6 +80,17 @@ router.post("/", authMiddleware, createPost);
 router.put("/:id", authMiddleware, checkIsPostOwner, updatePost);
 router.delete("/:id", authMiddleware, checkIsPostOwnerOrAdmin, deletePost);
 
+router.get("/user/:id", getPostsCreatedByUser);
+router.get("/favorites", authMiddleware, getFavoritePostsOfUser);
+router.get("/category/:id", getPostsByCategory);
+router.get("/filtered", getPostsFiltered);
 
+router.post("/:id/like", authMiddleware, likePost);
+router.post("/:id/unlike", authMiddleware, unlikePost);
+router.post("/:id/dislike", authMiddleware, dislikePost);
+router.post("/:id/undislike", authMiddleware, undislikePost);
+router.post("/:id/save", authMiddleware, savePost);
+router.post("/:id/unsave", authMiddleware, unsavePost);
 
+router.post("/:id/comment", authMiddleware, commentOnPost);
 module.exports = router;
