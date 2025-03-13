@@ -77,7 +77,7 @@ router.post("/filtered", getPostsFiltered);
  *       500:
  *         description: Internal server error
  */
-router.get("/", getAllPosts);
+router.post("/", getAllPosts);
 router.get("/:id", getPost);
 router.post("/", authMiddleware, createPost);
 router.put("/:id", authMiddleware, checkIsPostOwner, updatePost);
