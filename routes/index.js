@@ -1,5 +1,5 @@
-const userRoutes = require("./users");
-const authenticationRoutes = require("./authenticate");
+const authenticateRoutes = require("./authenticate");
+const postRoutes = require("./posts");
 const cors = require("cors");
 const corsOptions = {
   origin: "*",
@@ -7,8 +7,8 @@ const corsOptions = {
 
 function initRoutes(app) {
   app.use(cors(corsOptions));
-  app.use("/", authenticationRoutes);
-  app.use("/api/users", userRoutes);
+  app.use("/", authenticateRoutes);
+  app.use("/api/posts", postRoutes);
 }
 
 module.exports = initRoutes;
