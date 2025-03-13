@@ -9,6 +9,7 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerJSDoc = require("swagger-jsdoc");
 
 const initRoutes = require("./routes");
+const fileUpload = require("express-fileupload");
 
 var app = express();
 
@@ -29,8 +30,8 @@ const swaggerOptions = {
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
 
 // Serve Swagger UI at /api-docs
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use(fileUpload());
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "jade");
