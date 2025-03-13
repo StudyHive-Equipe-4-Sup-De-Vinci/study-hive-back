@@ -66,8 +66,27 @@ function authMiddleware(req, res, next) {
   });
 }
 
+/**
+ * Middleware to check if the authenticated user is an admin.
+ * The token is verified and the user's admin status is checked.
+ */
+async function checkIsAdmin(req, res, next) {
+  const token = req.headers["authorization"];
+  jwt.verify(token, "secret-key", async (err, decoded) => {
+    const authenticated_id = decoded.user.id;
+    const user = await User.findByPk( authenticated_id );
+    if (!user.is_admin) {
+      return res
+        .status(401)
+        .send({ message: "You don't have the rights to do that" });
+    }
+    next();
+  });
+}
+
 module.exports = {
   validateLogin,
   validateRegister,
   authMiddleware,
+	checkIsAdmin,
 };
