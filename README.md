@@ -44,8 +44,8 @@ Voici la liste des variables utilisées dans ce projet, qui sont toutes stockée
    - Description : Secret associé au token pour l'authentification CleverCloud.  
    - Source : Stockée dans les *secrets* de GitHub.
 
-10. **APP_ID_DEV**  
-    - Description : ID de l'application sur CleverCloud pour l'environnement de développement.  
+10. **APP_ID**  
+    - Description : ID de l'application sur CleverCloud pour l'environnement de production.  
     - Source : Stockée dans les *secrets* de GitHub.
 
 11. **BACK_PORT**  
@@ -75,7 +75,7 @@ Pour que ce processus fonctionne correctement, vous devez avoir configuré les s
 - `CLEVER_SSH_PRIVATE_KEY`
 - `CLEVER_TOKEN`
 - `CLEVER_SECRET`
-- `APP_ID_DEV`
+- `APP_ID`
 - `BACK_PORT`
 
 Ces secrets sont utilisés pour sécuriser la connexion à votre base de données et à CleverCloud pendant le processus de déploiement.
