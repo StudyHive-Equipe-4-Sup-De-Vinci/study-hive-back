@@ -3,9 +3,20 @@ const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(models) {
+      User.hasMany(models.Post, {
+        foreignKey: "user_id",
+        as: "posts",
+      });
+    }
+
     cleanUser() {
-      const { password, access_token, is_admin, ...currentUser } =
-        this.dataValues;
+      const { password, access_token, ...currentUser } = this.dataValues;
       return currentUser;
     }
   }
@@ -24,15 +35,20 @@ module.exports = (sequelize, DataTypes) => {
         unique: true,
         field: "pseudo",
       },
+      registration_date: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        field: "dt_inscription",
+      },
+      password: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
       email: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
         field: "mail",
-      },
-      password: {
-        type: DataTypes.STRING,
-        allowNull: false,
       },
       access_token: {
         type: DataTypes.TEXT,
@@ -41,11 +57,6 @@ module.exports = (sequelize, DataTypes) => {
       is_admin: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
-      },
-      registration_date: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        field: "dt_inscription",
       },
       profile_picture_link: {
         type: DataTypes.TEXT,
