@@ -1,15 +1,12 @@
 const { Op } = require("sequelize");
 const {
-  Action,
   Category,
-  Comment,
   Post,
   UserAction,
   User,
   sequelize,
 } = require("../models");
 const { uploadFileToS3 } = require("./aws");
-const { post } = require("../app");
 
 /**
  * Method to retrieve all posts, take pagination into account.
@@ -23,50 +20,49 @@ async function getAllPosts(req, res, next) {
 
     const offset = (page - 1) * pageSize;
 
-    const { count, rows } = await Post.findAndCountAll({
-      limit: pageSize,
-      offset: offset,
-      order: [["id_post", "DESC"]],
-      include: [
-        {
-          model: User,
-          as: "user",
-        },
-        {
-          model: Category,
-          as: "category",
-        },
-      ],
-      // attributes: {
-      // 	include: [
-      // 		[
-      // 			sequelize.literal(`(
-      // 				SELECT COUNT(*)
-      // 				FROM user_action as likes
-      // 				WHERE
-      // 					id_post = Post.id_post AND
-      // 					id_action = 1
-      // 			) - (
-      // 				SELECT COUNT(*)
-      // 				FROM user_action as dislikes
-      // 				WHERE
-      // 					id_post = Post.id_post AND
-      // 					id_action = 2
-      // 			)`),
-      // 			"likeDislikeCount",
-      // 		],
-      // 	],
-      // },
-      // group: ["Post.id_post", "user.id_user", "category.id_category"],
-    });
+    var { count, rows } = await Post.findAndCountAll(
+      {
+        limit: pageSize,
+        offset: offset,
+        order: [["created_at", "DESC"]],
+        include: [
+          {
+            model: User,
+            as: "user",
+          },
+          {
+            model: Category,
+            as: "category",
+          },
+        ],
+      }
+    );
 
-    res.status(200).json({
-      message: "Posts retrieved successfully",
-      Posts: rows,
-      totalPages: Math.ceil(count / pageSize),
-      currentPage: page,
-      pageSize: pageSize,
+    await rows.map(async element => {
+      const likes = await UserAction.findAll({
+        where: {
+          post_id: element.id,
+          action_id: 1
+        }
+      });
+      const dislikes = await UserAction.findAll({
+        where: {
+          post_id: element.id,
+          action_id: 2
+        }
+      });
+      element.dataValues.grade = (likes.length - dislikes.length);
+      return element
     });
+    setTimeout(() => {
+      res.status(200).json({
+        message: "Posts retrieved successfully",
+        Posts: rows,
+        totalPages: Math.ceil(count / pageSize),
+        page: page,
+        pageSize: pageSize,
+      });
+    }, 100);
   } catch (error) {
     res.status(500).send({ error: error.message });
   }
@@ -148,6 +144,21 @@ async function getPost(req, res, next) {
         message: `Post ${id} not found`,
       });
     }
+    
+    const likes = await UserAction.findAll({
+      where: {
+        post_id: post.id,
+        action_id: 1
+      }
+    });
+    const dislikes = await UserAction.findAll({
+      where: {
+        post_id: post.id,
+        action_id: 2
+      }
+    });
+    post.dataValues.grade = (likes.length - dislikes.length);
+
     res.status(200).json({
       message: "Post retrieved successfully",
       post,
@@ -238,10 +249,10 @@ async function deletePost(req, res, next) {
 async function getFavoritePostsOfUser(req, res, next) {
   try {
     const user_id = req.user.id;
-    const currentPage = parseInt(req.body.page) || 1;
+    const page = parseInt(req.body.page) || 1;
     const pageSize = parseInt(req.body.pageSize) || 10;
 
-    const offset = (currentPage - 1) * pageSize;
+    const offset = (page - 1) * pageSize;
 
     const userActions = await UserAction.findAll({
       where: {
@@ -270,13 +281,32 @@ async function getFavoritePostsOfUser(req, res, next) {
       ],
     });
 
-    res.status(200).json({
-      posts: rows,
-      totalPosts: count,
-      totalPages: Math.ceil(count / pageSize),
-      currentPage: currentPage,
-      pageSize: pageSize,
+    await rows.map(async element => {
+      const likes = await UserAction.findAll({
+        where: {
+          post_id: element.id,
+          action_id: 1
+        }
+      });
+      const dislikes = await UserAction.findAll({
+        where: {
+          post_id: element.id,
+          action_id: 2
+        }
+      });
+      element.dataValues.grade = (likes.length - dislikes.length);
+      return element
     });
+
+    setTimeout(() => {
+      res.status(200).json({
+        message: "Posts retrieved successfully",
+        Posts: rows,
+        totalPages: Math.ceil(count / pageSize),
+        page: page,
+        pageSize: pageSize,
+      });
+    }, 100);
   } catch (error) {
     res.status(500).send({ error: error.message });
   }
@@ -285,10 +315,10 @@ async function getFavoritePostsOfUser(req, res, next) {
 async function getPostsCreatedByUser(req, res, next) {
   try {
     const user_id = req.params.id;
-    const currentPage = parseInt(req.query.page) || 1;
+    const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
 
-    const offset = (currentPage - 1) * pageSize;
+    const offset = (page - 1) * pageSize;
 
     const { count, rows } = await Post.findAndCountAll({
       limit: pageSize,
@@ -308,25 +338,44 @@ async function getPostsCreatedByUser(req, res, next) {
       ],
     });
 
-    res.status(200).json({
-      posts: rows,
-      totalPosts: count,
-      totalPages: Math.ceil(count / pageSize),
-      currentPage: currentPage,
-      pageSize: pageSize,
+    await rows.map(async element => {
+      const likes = await UserAction.findAll({
+        where: {
+          post_id: element.id,
+          action_id: 1
+        }
+      });
+      const dislikes = await UserAction.findAll({
+        where: {
+          post_id: element.id,
+          action_id: 2
+        }
+      });
+      element.dataValues.grade = (likes.length - dislikes.length);
+      return element
     });
+
+    setTimeout(() => {
+      res.status(200).json({
+        message: "Posts retrieved successfully",
+        Posts: rows,
+        totalPages: Math.ceil(count / pageSize),
+        page: page,
+        pageSize: pageSize,
+      });
+    }, 100);
   } catch (error) {
     res.status(500).send({ error: error.message });
   }
 }
 
 async function getPostsByCategory(req, res, next) {
-  try {
-    const categoryId = req.params.id;
-    const currentPage = parseInt(req.query.page) || 1;
+	try {
+		const categoryId = req.params.id;
+    const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
 
-    const offset = (currentPage - 1) * pageSize;
+    const offset = (page - 1) * pageSize;
 
     const { count, rows } = await Post.findAndCountAll({
       limit: pageSize,
@@ -342,13 +391,32 @@ async function getPostsByCategory(req, res, next) {
       ],
     });
 
-    res.status(200).json({
-      posts: rows,
-      totalPosts: count,
-      totalPages: Math.ceil(count / pageSize),
-      currentPage: currentPage,
-      pageSize: pageSize,
+    await rows.map(async element => {
+      const likes = await UserAction.findAll({
+        where: {
+          post_id: element.id,
+          action_id: 1
+        }
+      });
+      const dislikes = await UserAction.findAll({
+        where: {
+          post_id: element.id,
+          action_id: 2
+        }
+      });
+      element.dataValues.grade = (likes.length - dislikes.length);
+      return element
     });
+
+    setTimeout(() => {
+      res.status(200).json({
+        message: "Posts retrieved successfully",
+        Posts: rows,
+        totalPages: Math.ceil(count / pageSize),
+        page: page,
+        pageSize: pageSize,
+      });
+    }, 100);
   } catch (error) {
     res.status(500).send({ error: error.message });
   }
@@ -357,10 +425,10 @@ async function getPostsByCategory(req, res, next) {
 async function getPostsFiltered(req, res, next) {
   try {
     const { search_query, category_id } = req.body;
-    const currentPage = parseInt(req.query.page) || 1;
+    const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
 
-    const offset = (currentPage - 1) * pageSize;
+    const offset = (page - 1) * pageSize;
     const whereConditions = {};
     if (
       category_id !== undefined &&
@@ -373,12 +441,14 @@ async function getPostsFiltered(req, res, next) {
     if (search_query && search_query !== "") {
       whereConditions[Op.or] = [
         { title: { [Op.like]: `%${search_query.toLowerCase()}%` } },
+        { description: { [Op.like]: `%${search_query.toLowerCase()}%` } },
       ];
     }
 
     const { count, rows } = await Post.findAndCountAll({
       limit: pageSize,
       offset: offset,
+      order: [["created_at", "DESC"]],
       where: whereConditions,
       include: [
         {
@@ -392,13 +462,32 @@ async function getPostsFiltered(req, res, next) {
       ],
     });
 
-    res.status(200).json({
-      posts: rows,
-      totalPosts: count,
-      totalPages: Math.ceil(count / pageSize),
-      currentPage: currentPage,
-      pageSize: pageSize,
+    await rows.map(async element => {
+      const likes = await UserAction.findAll({
+        where: {
+          post_id: element.id,
+          action_id: 1
+        }
+      });
+      const dislikes = await UserAction.findAll({
+        where: {
+          post_id: element.id,
+          action_id: 2
+        }
+      });
+      element.dataValues.grade = (likes.length - dislikes.length);
+      return element
     });
+
+    setTimeout(() => {
+      res.status(200).json({
+        message: "Posts retrieved successfully",
+        Posts: rows,
+        totalPages: Math.ceil(count / pageSize),
+        page: page,
+        pageSize: pageSize,
+      });
+    }, 100);
   } catch (error) {
     res.status(400).json({
       message: "Something went wrong",
