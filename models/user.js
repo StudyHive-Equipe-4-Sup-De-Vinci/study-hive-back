@@ -4,7 +4,8 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     cleanUser() {
-      const { password, token, ...currentUser } = this.dataValues;
+      const { password, access_token, is_admin, ...currentUser } =
+        this.dataValues;
       return currentUser;
     }
   }

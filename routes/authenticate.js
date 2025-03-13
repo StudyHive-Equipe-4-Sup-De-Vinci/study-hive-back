@@ -1,8 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const { validateRegister } = require("../middleware/authenticate");
-const { register } = require("../services/authenticate");
 const { sequelize } = require("../models");
+const { login, logout, register } = require("../services/authenticate");
+const {
+  validateLogin,
+  authMiddleware,
+  validateRegister,
+} = require("../middleware/authenticate");
 
 // DB Connection Health check
 router.get("/health_check", async (req, res) => {
@@ -17,6 +21,15 @@ router.get("/health_check", async (req, res) => {
   }
 });
 
+router.get("/protected", authMiddleware, (req, res) => {
+  res.status(200).send({ authenticated: true });
+});
+
+// API de connexion d'un utilisateur
+router.post("/login", validateLogin, login);
+
+// API de déconnexion d'un utilisateur
+router.get("/logout", authMiddleware, logout);
 // API d'inscription d'un utilisateur
 router.post("/register", validateRegister, register);
 
