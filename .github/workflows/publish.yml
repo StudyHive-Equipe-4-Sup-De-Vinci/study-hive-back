@@ -40,7 +40,7 @@ jobs:
       - name: Test curl
         run: |
           for i in {1..5}; do
-            curl --retry 5 --retry-delay 5 --retry-connrefused http://localhost:3000 && break
+            curl --retry 5 --retry-delay 5 --retry-connrefused http://localhost:3000/health_check && break
             echo "Retry $i..."
             sleep 5
           done
