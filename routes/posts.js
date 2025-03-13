@@ -75,10 +75,10 @@ const {
  *         description: Internal server error
  */
 router.get("/", getAllPosts);
-router.get("/", getPost);
+router.get("/:id", getPost);
 router.post("/", authMiddleware, createPost);
-router.put("/", authMiddleware, checkIsPostOwner, updatePost);
-router.delete("/", authMiddleware, checkIsPostOwnerOrAdmin, deletePost);
+router.put("/:id", authMiddleware, checkIsPostOwner, updatePost);
+router.delete("/:id", authMiddleware, checkIsPostOwnerOrAdmin, deletePost);
 
 
 
