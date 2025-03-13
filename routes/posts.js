@@ -8,7 +8,6 @@ const {
   getPost,
   getFavoritePostsOfUser,
   getPostsCreatedByUser,
-  getPostsByCategory,
   getPostsFiltered,
   likePost,
   unlikePost,
@@ -23,6 +22,10 @@ const {
   checkIsPostOwner,
   checkIsPostOwnerOrAdmin,
 } = require("../middleware/posts");
+
+router.get("/user/:id", getPostsCreatedByUser);
+router.get("/favorites", authMiddleware, getFavoritePostsOfUser);
+router.post("/filtered", getPostsFiltered);
 
 /**
  * @swagger
@@ -80,10 +83,6 @@ router.post("/", authMiddleware, createPost);
 router.put("/:id", authMiddleware, checkIsPostOwner, updatePost);
 router.delete("/:id", authMiddleware, checkIsPostOwnerOrAdmin, deletePost);
 
-router.get("/user/:id", getPostsCreatedByUser);
-router.get("/favorites", authMiddleware, getFavoritePostsOfUser);
-router.get("/category/:id", getPostsByCategory);
-router.get("/filtered", getPostsFiltered);
 
 router.post("/:id/like", authMiddleware, likePost);
 router.post("/:id/unlike", authMiddleware, unlikePost);
