@@ -79,9 +79,7 @@ async function createPost(req, res, next) {
   const transaction = await sequelize.transaction();
   try {
     const { title, description, content_link, category_id } = req.body;
-    const token = req.headers["authorization"];
-    const decoded = jwt.verify(token, "secret-key");
-    const user_id = decoded.user.id;
+    const user_id = req.user.id;
     const new_post = await Post.create(
       {
         title,
@@ -269,7 +267,7 @@ async function getFavoritePostsOfUser(req, res, next) {
 
 async function getPostsCreatedByUser(req, res, next) {
   try {
-    const userId = req.user.id;
+    const user_id = req.user.id;
     const currentPage = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
 
@@ -282,7 +280,7 @@ async function getPostsCreatedByUser(req, res, next) {
       },
       {
         where: {
-          owner_id: userId,
+          user_id,
         },
         include: [
           {

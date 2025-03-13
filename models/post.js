@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       Post.belongsTo(models.User, {
-        foreignKey: "owner_id",
+        foreignKey: "user_id",
         as: "user",
       });
       Post.belongsTo(models.Category, {
@@ -59,7 +59,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
 				defaultValue: null,
 			},
-			owner_id: {
+			user_id: {
 				type: DataTypes.STRING,
 				allowNull: false,
 				field: "id_user",

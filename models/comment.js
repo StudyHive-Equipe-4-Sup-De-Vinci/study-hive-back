@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       Comment.belongsTo(models.User, {
-        foreignKey: "owner_id",
+        foreignKey: "user_id",
         as: "user",
       });
 
@@ -33,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      owner_id: {
+      user_id: {
         type: DataTypes.STRING,
         allowNull: false,
         field: "id_user",
