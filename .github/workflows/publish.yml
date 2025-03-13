@@ -1,9 +1,6 @@
 name: Push git to CleverCloud APP
 
 on:
-  push:
-    branches:
-      - master  
   pull_request:
     branches:
       - master
@@ -12,31 +9,22 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout du repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Installer NPM
+      
+      - name: Installer Nodes
         run: |
-              sudo apt update
-              sudo apt install npm
+          sudo apt update && sudo apt upgrade -y
+          sudo apt install nodejs npm -y
+          sudo npm install
+          sudo node ./bin/www --silent &
 
-      - name: Start application
+      - name: Test curl
         run: |
-          DB_USERNAME=${{ secrets.DB_USERNAME }} \
-          DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-          DB_HOST=${{ secrets.DB_HOST }} \
-          DB_PORT=${{ secrets.DB_PORT }} \
-          DB_DATABASE=${{ secrets.DB_DATABASE }} \
-          BACK_PORT=${{ secrets.BACK_PORT }} \
-          nohup npm start &
-
-      - name: Vérifier si l'application fonctionne
-        run: |
-          curl http://localhost:${{ secrets.BACK_PORT }}/health_check
+          curl localhost:3000
 
   build-and-push:
     runs-on: ubuntu-latest
