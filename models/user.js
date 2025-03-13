@@ -4,7 +4,8 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     cleanUser() {
-      const { password, access_token, is_admin, ...currentUser } = this.dataValues;
+      const { password, access_token, is_admin, ...currentUser } =
+        this.dataValues;
       return currentUser;
     }
   }
@@ -45,6 +46,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DATE,
         allowNull: false,
         field: "dt_inscription",
+      },
+      profile_picture_link: {
+        type: DataTypes.TEXT,
+        defaultValue: null,
       },
     },
     {
