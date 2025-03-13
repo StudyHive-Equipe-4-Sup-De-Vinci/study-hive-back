@@ -1,11 +1,5 @@
 const { Op } = require("sequelize");
-const {
-  Category,
-  Post,
-  UserAction,
-  User,
-  sequelize,
-} = require("../models");
+const { Category, Post, UserAction, User, sequelize } = require("../models");
 const { uploadFileToS3 } = require("./aws");
 
 /**
@@ -20,39 +14,37 @@ async function getAllPosts(req, res, next) {
 
     const offset = (page - 1) * pageSize;
 
-    var { count, rows } = await Post.findAndCountAll(
-      {
-        limit: pageSize,
-        offset: offset,
-        order: [["created_at", "DESC"]],
-        include: [
-          {
-            model: User,
-            as: "user",
-          },
-          {
-            model: Category,
-            as: "category",
-          },
-        ],
-      }
-    );
+    var { count, rows } = await Post.findAndCountAll({
+      limit: pageSize,
+      offset: offset,
+      order: [["created_at", "DESC"]],
+      include: [
+        {
+          model: User,
+          as: "user",
+        },
+        {
+          model: Category,
+          as: "category",
+        },
+      ],
+    });
 
-    await rows.map(async element => {
+    await rows.map(async (element) => {
       const likes = await UserAction.findAll({
         where: {
           post_id: element.id,
-          action_id: 1
-        }
+          action_id: 1,
+        },
       });
       const dislikes = await UserAction.findAll({
         where: {
           post_id: element.id,
-          action_id: 2
-        }
+          action_id: 2,
+        },
       });
-      element.dataValues.grade = (likes.length - dislikes.length);
-      return element
+      element.dataValues.grade = likes.length - dislikes.length;
+      return element;
     });
     setTimeout(() => {
       res.status(200).json({
@@ -144,20 +136,20 @@ async function getPost(req, res, next) {
         message: `Post ${id} not found`,
       });
     }
-    
+
     const likes = await UserAction.findAll({
       where: {
         post_id: post.id,
-        action_id: 1
-      }
+        action_id: 1,
+      },
     });
     const dislikes = await UserAction.findAll({
       where: {
         post_id: post.id,
-        action_id: 2
-      }
+        action_id: 2,
+      },
     });
-    post.dataValues.grade = (likes.length - dislikes.length);
+    post.dataValues.grade = likes.length - dislikes.length;
 
     res.status(200).json({
       message: "Post retrieved successfully",
@@ -281,21 +273,21 @@ async function getFavoritePostsOfUser(req, res, next) {
       ],
     });
 
-    await rows.map(async element => {
+    await rows.map(async (element) => {
       const likes = await UserAction.findAll({
         where: {
           post_id: element.id,
-          action_id: 1
-        }
+          action_id: 1,
+        },
       });
       const dislikes = await UserAction.findAll({
         where: {
           post_id: element.id,
-          action_id: 2
-        }
+          action_id: 2,
+        },
       });
-      element.dataValues.grade = (likes.length - dislikes.length);
-      return element
+      element.dataValues.grade = likes.length - dislikes.length;
+      return element;
     });
 
     setTimeout(() => {
@@ -338,21 +330,21 @@ async function getPostsCreatedByUser(req, res, next) {
       ],
     });
 
-    await rows.map(async element => {
+    await rows.map(async (element) => {
       const likes = await UserAction.findAll({
         where: {
           post_id: element.id,
-          action_id: 1
-        }
+          action_id: 1,
+        },
       });
       const dislikes = await UserAction.findAll({
         where: {
           post_id: element.id,
-          action_id: 2
-        }
+          action_id: 2,
+        },
       });
-      element.dataValues.grade = (likes.length - dislikes.length);
-      return element
+      element.dataValues.grade = likes.length - dislikes.length;
+      return element;
     });
 
     setTimeout(() => {
@@ -370,8 +362,8 @@ async function getPostsCreatedByUser(req, res, next) {
 }
 
 async function getPostsByCategory(req, res, next) {
-	try {
-		const categoryId = req.params.id;
+  try {
+    const categoryId = req.params.id;
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
 
@@ -391,21 +383,21 @@ async function getPostsByCategory(req, res, next) {
       ],
     });
 
-    await rows.map(async element => {
+    await rows.map(async (element) => {
       const likes = await UserAction.findAll({
         where: {
           post_id: element.id,
-          action_id: 1
-        }
+          action_id: 1,
+        },
       });
       const dislikes = await UserAction.findAll({
         where: {
           post_id: element.id,
-          action_id: 2
-        }
+          action_id: 2,
+        },
       });
-      element.dataValues.grade = (likes.length - dislikes.length);
-      return element
+      element.dataValues.grade = likes.length - dislikes.length;
+      return element;
     });
 
     setTimeout(() => {
@@ -462,21 +454,21 @@ async function getPostsFiltered(req, res, next) {
       ],
     });
 
-    await rows.map(async element => {
+    await rows.map(async (element) => {
       const likes = await UserAction.findAll({
         where: {
           post_id: element.id,
-          action_id: 1
-        }
+          action_id: 1,
+        },
       });
       const dislikes = await UserAction.findAll({
         where: {
           post_id: element.id,
-          action_id: 2
-        }
+          action_id: 2,
+        },
       });
-      element.dataValues.grade = (likes.length - dislikes.length);
-      return element
+      element.dataValues.grade = likes.length - dislikes.length;
+      return element;
     });
 
     setTimeout(() => {
