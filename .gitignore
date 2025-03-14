@@ -61,3 +61,5 @@ typings/
 .next
 
 publish.yml
+README.me
+.github/workflows/publish.yml
