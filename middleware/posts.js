@@ -3,9 +3,9 @@ const { Post, User } = require("../models");
 const jwt = require("jsonwebtoken");
 
 /**
- * Validates the request for creating a new post. 
+ * Validates the request for creating a new post.
  * It checks that the title, description, content_link and category_id are properly provided and formatted.
-*/
+ */
 async function validateCreatePost(req, res, next) {
   const [error] = await checkSchema({
     title: {
@@ -38,9 +38,9 @@ async function validateCreatePost(req, res, next) {
 }
 
 /**
- * Validates the request for updating an post. 
+ * Validates the request for updating an post.
  * Ensures that title, description, price, status, and category_id are provided and properly formatted.
-*/
+ */
 async function validateUpdatePost(req, res, next) {
   const [error] = await checkSchema({
     title: {
@@ -63,7 +63,7 @@ async function validateUpdatePost(req, res, next) {
       notEmpty: true,
       isInt: true,
     },
-	}).run(req);
+  }).run(req);
 
   if (!error.isEmpty()) {
     return res.status(400).json({ error: error.array() });
@@ -72,10 +72,10 @@ async function validateUpdatePost(req, res, next) {
   next();
 }
 
-/** 
+/**
  * Checks if the authenticated user is the owner of the post being modified.
  * Verifies the JWT token and ensures that the user's email matches the owner of the post.
-*/
+ */
 async function checkIsPostOwner(req, res, next) {
   const token = req.headers["authorization"];
 
@@ -96,10 +96,10 @@ async function checkIsPostOwner(req, res, next) {
   });
 }
 
-/** 
+/**
  * Checks if the authenticated user is the owner or an admin.
  * Verifies that the user either owns the post or has admin rights.
-*/
+ */
 async function checkIsPostOwnerOrAdmin(req, res, next) {
   const token = req.headers["authorization"];
   const post_id = req.params.id;

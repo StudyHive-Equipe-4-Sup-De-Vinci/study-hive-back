@@ -74,7 +74,7 @@ async function checkIsAdmin(req, res, next) {
   const token = req.headers["authorization"];
   jwt.verify(token, "secret-key", async (err, decoded) => {
     const authenticated_id = decoded.user.id;
-    const user = await User.findByPk( authenticated_id );
+    const user = await User.findByPk(authenticated_id);
     if (!user.is_admin) {
       return res
         .status(401)
@@ -88,5 +88,5 @@ module.exports = {
   validateLogin,
   validateRegister,
   authMiddleware,
-	checkIsAdmin,
+  checkIsAdmin,
 };
