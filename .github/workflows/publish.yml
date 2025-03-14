@@ -5,9 +5,9 @@ on:
       - master
   pull_request:
     branches:
-      - master
+      - main
     types:
-      - closed  
+      - closed
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
       - name: Installer Nodes
         run: |
           sudo apt update && sudo apt upgrade -y
@@ -52,7 +52,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-        
+
       - name: install clever cloud
         run: |
           sudo apt install gpg
@@ -61,7 +61,7 @@ jobs:
           echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/cc-nexus-deb.gpg] https://nexus.clever-cloud.com/repository/deb stable main" | sudo tee -a /etc/apt/sources.list
           sudo apt-get update
           sudo apt-get install clever-tools
-              
+
       - name: Ajouter la clé SSH pour Clever Cloud
         env:
           SSH_PRIVATE_KEY: ${{ secrets.CLEVER_SSH_PRIVATE_KEY }}
@@ -73,7 +73,7 @@ jobs:
 
       - name: Installer GIT
         run: sudo apt update | sudo apt install git -y
-      
+
       - name: Configurer Git pour GitHub Actions
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -84,11 +84,11 @@ jobs:
 
       - name: Deploy github
         run: |
-             git remote add clever git+ssh://git@push-n3-par-clevercloud-customers.services.clever-cloud.com/${{ secrets.APP_ID }}.git 
-             git add .
-             git commit -m "Mise à jour automatique via CI/CD" || echo "Aucune modification à commit"
-             git push clever master --force
-      
+          git remote add clever git+ssh://git@push-n3-par-clevercloud-customers.services.clever-cloud.com/${{ secrets.APP_ID_DEV }}.git 
+          git add .
+          git commit -m "Mise à jour automatique via CI/CD" || echo "Aucune modification à commit"
+          git push clever main:master --force
+
       - name: SET VENV
         run: |
              clever login --token ${{ secrets.CLEVER_TOKEN }} --secret ${{ secrets.CLEVER_SECRET }}
