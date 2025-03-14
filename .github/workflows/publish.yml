@@ -5,7 +5,7 @@ on:
       - master
   pull_request:
     branches:
-      - main
+      - master
     types:
       - closed
 jobs:
@@ -87,7 +87,7 @@ jobs:
           git remote add clever git+ssh://git@push-n3-par-clevercloud-customers.services.clever-cloud.com/${{ secrets.APP_ID_DEV }}.git 
           git add .
           git commit -m "Mise à jour automatique via CI/CD" || echo "Aucune modification à commit"
-          git push clever main:master --force
+          git push clever master:master --force
 
       - name: SET VENV
         run: |
